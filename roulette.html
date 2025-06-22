@@ -246,6 +246,35 @@
         
         <div id="error-message" class="error-message"></div>
     </div>
+    <div id="debug-info" style="display: none; padding: 10px; background: #1a1a2e; color: white; font-family: monospace;">
+        <h3>Отладочная информация:</h3>
+        <div id="url-params"></div>
+        <div id="tg-webapp"></div>
+    </div>
+
+    <script>
+        // Отладочный код
+        const debugContainer = document.getElementById('debug-info');
+        const urlParamsDiv = document.getElementById('url-params');
+        const tgWebAppDiv = document.getElementById('tg-webapp');
+        
+        // Показываем отладочную информацию
+        debugContainer.style.display = 'block';
+        
+        // Выводим параметры URL
+        const urlParams = new URLSearchParams(window.location.search);
+        let paramsHTML = '<h4>Параметры URL:</h4>';
+        for (const [key, value] of urlParams.entries()) {
+            paramsHTML += `<p>${key} = ${value}</p>`;
+        }
+        urlParamsDiv.innerHTML = paramsHTML;
+        
+        // Выводим данные Telegram WebApp
+        let tgHTML = '<h4>Telegram WebApp данные:</h4>';
+        tgHTML += `<p>initData: ${JSON.stringify(Telegram.WebApp.initData)}</p>`;
+        tgHTML += `<p>initDataUnsafe: ${JSON.stringify(Telegram.WebApp.initDataUnsafe)}</p>`;
+        tgWebAppDiv.innerHTML = tgHTML;
+        
 
     <script>
         // Функция для разбора hash-параметров
