@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IlagTeam - Главная</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --accent: #ff00cc;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: #fff;
+            min-height: 100vh;
+            padding-top: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1000px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(106, 17, 203, 0.5);
+        }
+        
+        .tagline {
+            font-size: 18px;
+            color: #aaa;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .nav-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        .nav-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .nav-description {
+            color: #bbb;
+            font-size: 16px;
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+        
+        .btn-nav {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn-nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.4s;
+            z-index: -1;
+        }
+        
+        .btn-nav:hover::before {
+            width: 100%;
+        }
+        
+        .btn-nav:hover {
+            color: white;
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 50px;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .feature-icon {
+            font-size: 36px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .feature-text {
+            color: #aaa;
+            font-size: 15px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #777;
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .glow {
+            text-shadow: 0 0 10px rgba(255, 0, 204, 0.7), 0 0 20px rgba(255, 0, 204, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-rocket"></i> IlagTeam
+            </div>
+            <p class="tagline">Зарабатывай TON с нами! Крути рулетку, получай призы и следи за своей статистикой</p>
+            
+            <div class="nav-cards">
+                <div class="nav-card pulse">
+                    <div class="nav-icon">
+                        <i class="fas fa-dice"></i>
+                    </div>
+                    <h2 class="nav-title">Рулетка</h2>
+                    <p class="nav-description">Крути колесо и выигрывай ценные призы: TON, бонусы и многое другое!</p>
+                    <a href="roulette.html?user_id=12345" class="btn-nav">
+                        <i class="fas fa-play me-2"></i>Играть сейчас
+                    </a>
+                </div>
+                
+                <div class="nav-card">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2 class="nav-title">Профиль</h2>
+                    <p class="nav-description">Следи за своей статистикой, рангами и достижениями в команде</p>
+                    <a href="profile.html?user_id=12345" class="btn-nav">
+                        <i class="fas fa-user me-2"></i>Мой профиль
+                    </a>
+                </div>
+                
+                <div class="nav-card">
+                    <div class="nav-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h2 class="nav-title">История призов</h2>
+                    <p class="nav-description">Все твои выигранные призы в одном месте с фильтрацией</p>
+                    <a href="history.html?user_id=12345" class="btn-nav">
+                        <i class="fas fa-history me-2"></i>Мои призы
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <h3 class="feature-title">Зарабатывай TON</h3>
+                <p class="feature-text">Получай реальные криптовалютные призы за активность в команде</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3 class="feature-title">Повышай ранг</h3>
+                <p class="feature-text">Улучшай свой статус в команде и получай больше возможностей</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h3 class="feature-title">Эксклюзивные призы</h3>
+                <p class="feature-text">Уникальные бонусы и награды доступны только активным участникам</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 IlagTeam. Все права защищены.</p>
+            <p class="mt-2">Используйте возможности ответственно</p>
+        </div>
+    </div>
+
+    <script>
+        // Добавляем эффект пульсации для кнопки рулетки
+        document.addEventListener('DOMContentLoaded', function() {
+            const rouletteCard = document.querySelector('.nav-card.pulse');
+            
+            setInterval(() => {
+                rouletteCard.classList.toggle('glow');
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
