@@ -206,6 +206,18 @@
             background: rgba(233, 69, 96, 0.1);
         }
         
+        .debug-info {
+            display: block;
+            padding: 10px;
+            background: #1a1a2e;
+            color: white;
+            font-family: monospace;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
         @media (max-width: 600px) {
             h1 {
                 font-size: 2rem;
@@ -222,7 +234,7 @@
     </style>
 </head>
 <body>
-    <button class="back-button" onclick="window.location.href='index.html'">←</button>
+    <button class="back-button" onclick="goBack()">←</button>
     
     <div class="container">
         <header>
@@ -245,36 +257,13 @@
         <div class="result" id="result"></div>
         
         <div id="error-message" class="error-message"></div>
+        
+        <div class="debug-info">
+            <h3>Отладочная информация:</h3>
+            <div id="url-params"></div>
+            <div id="tg-webapp"></div>
+        </div>
     </div>
-    <div id="debug-info" style="display: none; padding: 10px; background: #1a1a2e; color: white; font-family: monospace;">
-        <h3>Отладочная информация:</h3>
-        <div id="url-params"></div>
-        <div id="tg-webapp"></div>
-    </div>
-
-    <script>
-        // Отладочный код
-        const debugContainer = document.getElementById('debug-info');
-        const urlParamsDiv = document.getElementById('url-params');
-        const tgWebAppDiv = document.getElementById('tg-webapp');
-        
-        // Показываем отладочную информацию
-        debugContainer.style.display = 'block';
-        
-        // Выводим параметры URL
-        const urlParams = new URLSearchParams(window.location.search);
-        let paramsHTML = '<h4>Параметры URL:</h4>';
-        for (const [key, value] of urlParams.entries()) {
-            paramsHTML += `<p>${key} = ${value}</p>`;
-        }
-        urlParamsDiv.innerHTML = paramsHTML;
-        
-        // Выводим данные Telegram WebApp
-        let tgHTML = '<h4>Telegram WebApp данные:</h4>';
-        tgHTML += `<p>initData: ${JSON.stringify(Telegram.WebApp.initData)}</p>`;
-        tgHTML += `<p>initDataUnsafe: ${JSON.stringify(Telegram.WebApp.initDataUnsafe)}</p>`;
-        tgWebAppDiv.innerHTML = tgHTML;
-        
 
     <script>
         // Функция для разбора hash-параметров
@@ -290,7 +279,7 @@
             return result;
         }
         
-        // Получаем параметры
+        // Получаем параметры из hash
         const hashParams = parseHashParams();
         const userId = hashParams.user_id;
         const canSpinInitial = hashParams.can_spin === '1';
@@ -301,10 +290,11 @@
         console.log("Hash Parameters:", hashParams);
         
         // Если параметры не найдены, попробуем получить из WebApp
-        if (!userId && window.Telegram.WebApp.initDataUnsafe.user) {
+        let finalUserId = userId;
+        if (!finalUserId && window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
             const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
             console.log("Using Telegram user ID:", tgUser.id);
-            userId = tgUser.id;
+            finalUserId = tgUser.id;
         }
         
         // Элементы интерфейса
@@ -313,39 +303,68 @@
         const result = document.getElementById('result');
         const spinInfo = document.getElementById('spin-info');
         const errorElement = document.getElementById('error-message');
+        const urlParamsDiv = document.getElementById('url-params');
+        const tgWebAppDiv = document.getElementById('tg-webapp');
+        
+        // Показываем отладочную информацию
+        if (urlParamsDiv && tgWebAppDiv) {
+            // Выводим параметры URL
+            let paramsHTML = '<h4>Параметры URL (hash):</h4>';
+            for (const [key, value] of Object.entries(hashParams)) {
+                paramsHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+            }
+            urlParamsDiv.innerHTML = paramsHTML;
+            
+            // Выводим данные Telegram WebApp
+            let tgHTML = '<h4>Telegram WebApp данные:</h4>';
+            if (window.Telegram && window.Telegram.WebApp) {
+                tgHTML += `<p><strong>initData:</strong> ${JSON.stringify(Telegram.WebApp.initData)}</p>`;
+                tgHTML += `<p><strong>initDataUnsafe:</strong> ${JSON.stringify(Telegram.WebApp.initDataUnsafe)}</p>`;
+            } else {
+                tgHTML += '<p>Telegram WebApp API не доступен</p>';
+            }
+            tgWebAppDiv.innerHTML = tgHTML;
+        }
         
         // Призы
         let prizes = [];
         let isSpinning = false;
-        let canSpin = true;
-        let currentPosition = 0;
+        let canSpin = canSpinInitial;
         
         // Функция для отображения ошибки
         function showError(message) {
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+            console.error(message);
         }
         
         // Функция для скрытия ошибки
         function hideError() {
-            errorElement.style.display = 'none';
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
         }
         
         // Загрузка списка призов
         async function loadPrizes() {
             try {
-                if (!userId) {
+                if (!finalUserId) {
                     throw new Error('User ID не найден');
                 }
                 
-                const response = await fetch('/api/prizes');
+                // ЗАМЕНИТЕ НА ВАШ ДОМЕН API
+                const apiUrl = 'https://ваш-домен.com/api/prizes';
+                const response = await fetch(apiUrl);
+                
                 if (!response.ok) {
                     throw new Error('Ошибка при загрузке призов');
                 }
                 
                 prizes = await response.json();
                 createRouletteItems();
-                checkSpinAvailability();
+                updateSpinButtonState();
             } catch (error) {
                 showError(`Ошибка: ${error.message}`);
                 console.error('Ошибка загрузки призов:', error);
@@ -354,9 +373,11 @@
         
         // Создаем элементы рулетки
         function createRouletteItems() {
+            if (!rouletteTrack) return;
+            
             rouletteTrack.innerHTML = '';
             
-            // Добавляем дополнительные элементы для плавной анимации
+            // Добавляем элементы для плавной анимации
             for (let i = 0; i < 2; i++) {
                 prizes.forEach(prize => {
                     const item = document.createElement('div');
@@ -371,44 +392,29 @@
             }
         }
         
-        // Проверка доступности вращения
-        async function checkSpinAvailability() {
-            try {
-                if (!userId) {
-                    throw new Error('User ID не найден');
-                }
-                
-                const response = await fetch(`/api/can_spin?user_id=${userId}`);
-                if (!response.ok) {
-                    throw new Error('Ошибка при проверке доступности вращения');
-                }
-                
-                const data = await response.json();
-                canSpin = data.can_spin;
-                
-                if (canSpin) {
-                    spinButton.disabled = false;
-                    spinInfo.textContent = "Доступно 1 вращение в неделю";
-                } else {
-                    spinButton.disabled = true;
-                    spinInfo.textContent = `Следующее вращение доступно через ${data.days_until_next} дней`;
-                }
-                
-                hideError();
-            } catch (error) {
-                showError(`Ошибка: ${error.message}`);
-                console.error('Ошибка проверки доступности:', error);
+        // Обновление состояния кнопки
+        function updateSpinButtonState() {
+            if (!spinButton || !spinInfo) return;
+            
+            if (canSpin) {
+                spinButton.disabled = false;
+                spinInfo.textContent = "Доступно 1 вращение в неделю";
+            } else {
+                spinButton.disabled = true;
+                spinInfo.textContent = `Следующее вращение доступно через ${nextSpinDays} дней`;
             }
         }
         
         // Анимация вращения
         function spinRoulette() {
-            if (isSpinning || !canSpin) return;
+            if (!rouletteTrack || isSpinning || !canSpin) return;
             
             isSpinning = true;
             spinButton.disabled = true;
-            result.textContent = "";
-            result.classList.remove('win-animation');
+            if (result) {
+                result.textContent = "";
+                result.classList.remove('win-animation');
+            }
             
             // Выбираем приз на основе вероятностей
             const random = Math.random();
@@ -425,12 +431,12 @@
             
             const prize = prizes[prizeIndex].name;
             
-            // Рассчитываем позицию для остановки (с учетом дублированных элементов)
+            // Рассчитываем позицию для остановки
             const targetPosition = -((prizes.length * 100) + (prizeIndex * 200));
             
             // Начальная скорость
             let speed = 30;
-            let currentPos = currentPosition;
+            let currentPos = 0;
             
             // Функция анимации
             function animate() {
@@ -443,7 +449,6 @@
                     
                     if (speed < 0.5) {
                         // Финиш
-                        currentPosition = currentPos;
                         finishSpin(prize);
                         return;
                     }
@@ -457,24 +462,42 @@
         
         // Завершение вращения
         function finishSpin(prize) {
-            result.textContent = `🎉 Поздравляем! Вы выиграли: ${prize}`;
-            result.classList.add('win-animation');
+            if (result) {
+                result.textContent = `🎉 Поздравляем! Вы выиграли: ${prize}`;
+                result.classList.add('win-animation');
+            }
             
             // Отправляем результат в бот
-            if (window.Telegram.WebApp.sendData) {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.sendData) {
                 window.Telegram.WebApp.sendData(prize);
             }
             
-            isSpinning = false;
+            // Блокируем дальнейшие вращения
             canSpin = false;
-            spinButton.disabled = true;
-            spinInfo.textContent = "Следующее вращение будет доступно через 7 дней";
+            updateSpinButtonState();
+            isSpinning = false;
+            
+            if (spinInfo) {
+                spinInfo.textContent = "Следующее вращение будет доступно через 7 дней";
+            }
+        }
+        
+        // Навигация назад
+        function goBack() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
+                window.Telegram.WebApp.close();
+            } else {
+                window.history.back();
+            }
         }
         
         // Инициализация
-        if (userId) {
+        if (finalUserId) {
             loadPrizes();
-            spinButton.addEventListener('click', spinRoulette);
+            if (spinButton) {
+                spinButton.addEventListener('click', spinRoulette);
+            }
+            updateSpinButtonState();
         } else {
             showError('Ошибка: User ID не найден в параметрах URL');
         }
