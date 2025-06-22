@@ -251,9 +251,12 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        // Получение user_id из параметров URL
+        // Получение параметров из URL
         const urlParams = new URLSearchParams(window.location.search);
         const userId = urlParams.get('user_id');
+        const canSpinInitial = urlParams.get('can_spin') === '1';
+        const nextSpinDays = urlParams.get('next_spin');
+        const apiBaseUrl = urlParams.get('api_url') || '';  // Базовый URL API
         
         // Элементы интерфейса
         const rouletteTrack = document.getElementById('roulette-track');
