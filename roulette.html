@@ -234,7 +234,7 @@
     </style>
 </head>
 <body>
-    <button class="back-button" onclick="goBack()">←</button>
+    <button class="back-button" onclick="goToIndex()">←</button>
     
     <div class="container">
         <header>
@@ -354,20 +354,39 @@
                     throw new Error('User ID не найден');
                 }
                 
-                // ЗАМЕНИТЕ НА ВАШ ДОМЕН API
-                const apiUrl = 'https://ваш-домен.com/api/prizes';
+                // Используем относительный путь для API
+                const apiUrl = '/api/prizes';
                 const response = await fetch(apiUrl);
                 
                 if (!response.ok) {
-                    throw new Error('Ошибка при загрузке призов');
+                    // Если ответ не 200, попробуем с базовым URL
+                    const fallbackResponse = await fetch(`https://${window.location.hostname}:5001/api/prizes`);
+                    if (fallbackResponse.ok) {
+                        prizes = await fallbackResponse.json();
+                    } else {
+                        throw new Error('Ошибка при загрузке призов');
+                    }
+                } else {
+                    prizes = await response.json();
                 }
                 
-                prizes = await response.json();
                 createRouletteItems();
                 updateSpinButtonState();
             } catch (error) {
                 showError(`Ошибка: ${error.message}`);
                 console.error('Ошибка загрузки призов:', error);
+                
+                // Использовать тестовые данные при ошибке
+                prizes = [
+                    {"name": "20 TON 💰", "probability": 0.0000001, "color": "#9c27b0"},
+                    {"name": "3 TON 💰", "probability": 0.10, "color": "#00bcd4"},
+                    {"name": "80% на 3 дня 🖼️", "probability": 0.10, "color": "#4caf50"},
+                    {"name": "60% на 3 дня", "probability": 0.40, "color": "#ffc107"},
+                    {"name": "75% на 3 дня 😺", "probability": 0.25, "color": "#e94560"},
+                    {"name": "1 TON 🎁", "probability": 0.45, "color": "#0fccce"}
+                ];
+                createRouletteItems();
+                updateSpinButtonState();
             }
         }
         
@@ -482,13 +501,10 @@
             }
         }
         
-        // Навигация назад
-        function goBack() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
-                window.Telegram.WebApp.close();
-            } else {
-                window.history.back();
-            }
+        // Навигация на главную страницу
+        function goToIndex() {
+            // Переходим на главную страницу, передавая user_id в hash
+            window.location.href = `index.html#user_id=${finalUserId}`;
         }
         
         // Инициализация
