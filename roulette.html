@@ -248,15 +248,35 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        // Функция для разбора hash-параметров
+        function parseHashParams() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const result = {};
+            
+            for (const [key, value] of params.entries()) {
+                result[key] = value;
+            }
+            
+            return result;
+        }
         
-        // Получение параметров из URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('user_id');
-        const canSpinInitial = urlParams.get('can_spin') === '1';
-        const nextSpinDays = urlParams.get('next_spin');
-        const apiBaseUrl = urlParams.get('api_url') || '';  // Базовый URL API
+        // Получаем параметры
+        const hashParams = parseHashParams();
+        const userId = hashParams.user_id;
+        const canSpinInitial = hashParams.can_spin === '1';
+        const nextSpinDays = hashParams.next_spin;
+        const timestamp = hashParams.t;
+        
+        // Отладочный вывод
+        console.log("Hash Parameters:", hashParams);
+        
+        // Если параметры не найдены, попробуем получить из WebApp
+        if (!userId && window.Telegram.WebApp.initDataUnsafe.user) {
+            const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+            console.log("Using Telegram user ID:", tgUser.id);
+            userId = tgUser.id;
+        }
         
         // Элементы интерфейса
         const rouletteTrack = document.getElementById('roulette-track');
