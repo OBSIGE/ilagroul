@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>История призов IlagTeam</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: #fff;
+            min-height: 100vh;
+            padding-top: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container {
+            max-width: 800px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+        }
+        
+        .header h1 {
+            font-weight: 800;
+            margin: 0;
+            font-size: 28px;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 0 15px;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary);
+        }
+        
+        .prizes-list {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .prize-header {
+            display: grid;
+            grid-template-columns: 50px 1fr 120px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .prize-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 120px;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s;
+        }
+        
+        .prize-item:last-child {
+            border-bottom: none;
+        }
+        
+        .prize-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .prize-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .prize-name {
+            font-weight: 500;
+        }
+        
+        .prize-date {
+            color: #aaa;
+            font-size: 14px;
+            text-align: right;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #aaa;
+        }
+        
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1><i class="fas fa-gift me-3"></i>История призов</h1>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="total-prizes">0</div>
+                <div class="stat-label">Всего призов</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="ton-won">0 TON</div>
+                <div class="stat-label">Выиграно TON</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="last-prize">-</div>
+                <div class="stat-label">Последний приз</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-btn active">Все призы</button>
+            <button class="filter-btn">TON</button>
+            <button class="filter-btn">Бонусы</button>
+            <button class="filter-btn">Другое</button>
+            <button class="filter-btn">
+                <i class="fas fa-calendar me-1"></i>За последний месяц
+            </button>
+        </div>
+
+        <div class="prizes-list">
+            <div class="prize-header">
+                <div>#</div>
+                <div>Приз</div>
+                <div>Дата</div>
+            </div>
+            <div id="prizes-container">
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>Загрузка истории...</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Установка API базового URL
+        const API_BASE_URL = "http://localhost:5000";
+        
+        // Получаем параметры из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
+        const token = urlParams.get('token');
+        
+        // Инициализация истории
+        async function initPrizes() {
+            try {
+                // Получение истории призов
+                const response = await fetch(`${API_BASE_URL}/api/prize_history?user_id=${userId}&token=${token}`);
+                const prizesData = await response.json();
+                
+                // Статистика
+                document.getElementById('total-prizes').textContent = prizesData.total_count;
+                document.getElementById('ton-won').textContent = `${prizesData.ton_won} TON`;
+                document.getElementById('last-prize').textContent = prizesData.last_prize || '-';
+                
+                // Заполнение списка призов
+                const prizesContainer = document.getElementById('prizes-container');
+                prizesContainer.innerHTML = '';
+                
+                if (prizesData.prizes.length === 0) {
+                    prizesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-box-open"></i>
+                            <h3>Призов пока нет</h3>
+                            <p>Ваши выигранные призы появятся здесь</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                prizesData.prizes.forEach((prize, index) => {
+                    const prizeElement = document.createElement('div');
+                    prizeElement.className = 'prize-item';
+                    prizeElement.innerHTML = `
+                        <div class="prize-icon">
+                            <i class="fas ${prize.icon}"></i>
+                        </div>
+                        <div class="prize-name">${prize.name}</div>
+                        <div class="prize-date">${prize.date}</div>
+                    `;
+                    prizesContainer.appendChild(prizeElement);
+                });
+                
+                // Обработчики фильтров
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        
+                        const filterType = btn.textContent.trim();
+                        const filterResponse = await fetch(`${API_BASE_URL}/api/prize_history?user_id=${userId}&token=${token}&filter=${filterType}`);
+                        const filteredData = await filterResponse.json();
+                        
+                        // Обновление списка
+                        const prizesContainer = document.getElementById('prizes-container');
+                        prizesContainer.innerHTML = '';
+                        
+                        filteredData.prizes.forEach((prize, index) => {
+                            const prizeElement = document.createElement('div');
+                            prizeElement.className = 'prize-item';
+                            prizeElement.innerHTML = `
+                                <div class="prize-icon">
+                                    <i class="fas ${prize.icon}"></i>
+                                </div>
+                                <div class="prize-name">${prize.name}</div>
+                                <div class="prize-date">${prize.date}</div>
+                            `;
+                            prizesContainer.appendChild(prizeElement);
+                        });
+                    });
+                });
+            } catch (error) {
+                console.error('Prizes load error:', error);
+                document.getElementById('prizes-container').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Ошибка загрузки</h3>
+                        <p>Попробуйте позже</p>
+                    </div>
+                `;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', initPrizes);
+    </script>
+</body>
+</html>
